@@ -71,3 +71,46 @@ sub download($$$)
     sign_request($req, $key);
     return (new LWP::UserAgent)->request($req);
 }
+
+sub listcontainers($$)
+{
+    my ($account, $key) = @_;
+
+    my $req = new HTTP::Request('GET', "http://$account.blob.core.windows.net/?comp=list");
+    sign_request($req, $key);
+
+    return (new LWP::UserAgent)->request($req);
+}
+
+sub getacl($$$)
+{
+    my ($account, $key, $path) = @_;
+
+    my $req = new HTTP::Request('GET', "http://$account.blob.core.windows.net/$path?restype=container&comp=acl");
+    sign_request($req, $key);
+
+    return (new LWP::UserAgent)->request($req);
+}
+
+sub listblobs($$$)
+{
+    my ($account, $key, $path) = @_;
+
+    my $req = new HTTP::Request('GET', "http://$account.blob.core.windows.net/$path?restype=container&comp=list");
+    sign_request($req, $key);
+
+    return (new LWP::UserAgent)->request($req);
+}
+
+sub traverseblobs($$$)
+{
+    my ($account, $key, $path) = @_;
+
+    my $req = new HTTP::Request('GET', "http://$account.blob.core.windows.net/$path?restype=container&comp=list");
+    sign_request($req, $key);
+
+    return (new LWP::UserAgent)->request($req);
+}
+
+
+
