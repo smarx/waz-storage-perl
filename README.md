@@ -1,3 +1,8 @@
+[ This is based on code written by Steve Marx - thank you Steve - I have just extended a bit.  
+
+  Pull request has been sent. -- jamie ] 
+  
+
 WindowsAzure::Storage
 =====================
 A small library for working with Windows Azure storage from Perl.
