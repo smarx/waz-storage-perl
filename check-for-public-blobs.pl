@@ -11,30 +11,40 @@ my $res = WindowsAzure::Storage::listcontainers($account, $key);
 
 die "ERROR: getting container list\n" . $res->as_string unless $res->code == 200;
 
-$rs=$res->as_string;
+$rs_total=$res->as_string;
 
-if ($rs=~m!<Name>([^<]+)</Name>!) {
-    $name=$1;
-    print "Enumerating container $name...\n" if $verbose;
-    
-    my $bres = WindowsAzure::Storage::listblobs($account, $key, $name);
+@containers=split(m/<Container>/,$rs_total);
 
-    die "ERROR:\n" . $bres->as_string unless $bres->code == 200;
+for $rs (@containers) {
 
-    $brs=$bres->as_string;
+    if ($rs=~m!<Name>([^<]+)</Name>!) {
 
-    if ($brs=~m!<Name>([^<]+)</Name>!) {
-	$bname=$1;
-	print "Checking blob $bname...\n" if $verbose;
+	$name=$1;
+	print "Enumerating container $name...\n" if $verbose;
 	
-	my $breq = new HTTP::Request('GET', "http://$account.blob.core.windows.net/$name/$bname");
-	
-	$cres=(new LWP::UserAgent)->request($breq);
+	my $bres = WindowsAzure::Storage::listblobs($account, $key, $name);
 
-	if ($cres->code == 200) { 
-	    print "*** Public access blob $name/$bname (wget http://$account.blob.core.windows.net/$name/$bname)\n\n";
+	die "ERROR:\n" . $bres->as_string unless $bres->code == 200;
+
+	$brs_total=$bres->as_string;
+
+	@blobs=split(m/<Blob>/,$brs_total);
+
+	for $brs (@blobs) {
+
+	    if ($brs=~m!<Name>([^<]+)</Name>!) {
+		
+		$bname=$1;
+		print "Checking blob $bname...\n" if $verbose;
+		
+		my $breq = new HTTP::Request('GET', "http://$account.blob.core.windows.net/$name/$bname");
+		
+		$cres=(new LWP::UserAgent)->request($breq);
+		
+		if ($cres->code == 200) { 
+		    print "*** Public access blob $name/$bname (wget http://$account.blob.core.windows.net/$name/$bname)\n\n";
+		}
+	    }
 	}
     }
-
 }
-
